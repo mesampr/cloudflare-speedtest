@@ -1,50 +1,42 @@
 # 🚀 Cloudflare Worker Speedtest
 
-A lightweight, serverless internet speed test running entirely on **Cloudflare Workers**. It measures Ping, Jitter, Download, and Upload speeds without needing a heavy backend server.
-
-![Speedtest UI](https://via.placeholder.com/800x400?text=Speedtest+Worker+UI)
+A lightweight, serverless internet speed test running entirely on **Cloudflare Workers**. This project measures Ping, Jitter, Download, and Upload speeds using Cloudflare's global edge network.
 
 ## ✨ Features
-* **⚡ Serverless:** Runs on Cloudflare's global edge network (low latency).
-* **📉 Low Memory Footprint:** Uses **Stream API** for download tests to avoid crashing the 128MB RAM limit of the free tier.
-* **💾 History Logging:** Saves test results (Ping, DL, UL, ISP) using **Cloudflare KV**.
-* **🎨 Modern UI:** Responsive HTML/CSS interface with real-time progress updates.
-* **📱 Mobile Friendly:** Fully responsive grid layout.
+* **⚡ Serverless:** Zero server maintenance, runs on the edge.
+* **📈 Optimized for Free Tier:** Uses **Streaming API** to ensure it stays within the 128MB RAM limit.
+* **💾 History Logging:** Automatically saves your last 10 test results.
+* **🎨 Professional UI:** Responsive design with real-time speed updates and SVG icons.
 
-## 🛠️ Setup & Deployment
+## 🛠️ Setup & Deployment (via Cloudflare Dashboard)
 
-### 1. Prerequisites
-* A Cloudflare account.
-* Node.js and npm installed.
-* Wrangler CLI installed (`npm install -g wrangler`).
+### Step 1: Create the KV Namespace (For History)
+1. Log in to your **Cloudflare Dashboard**.
+2. Navigate to **Workers & Pages** > **KV**.
+3. Click **Create a namespace**.
+4. Name it `SPEED_HISTORY` and click **Add**.
 
-### 2. Configuration
-1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/YOUR_USERNAME/cloudflare-speedtest.git](https://github.com/YOUR_USERNAME/cloudflare-speedtest.git)
-    cd cloudflare-speedtest
-    ```
+### Step 2: Create the Worker
+1. Go to **Workers & Pages** > **Overview**.
+2. Click **Create application** > **Create Worker**.
+3. Give it a name (e.g., `speedtest-worker`) and click **Deploy**.
+4. Click **Edit Code**.
+5. Delete the default code and paste the code from `index.js` in this repository.
+6. Click **Save and Deploy**.
 
-2.  **Create a KV Namespace:**
-    Run this command to create a database for your history logs:
-    ```bash
-    wrangler kv:namespace create "SPEED_HISTORY"
-    ```
-    *Copy the `id` output from this command.*
+### Step 3: Bind the KV to the Worker
+1. Go back to your Worker's main page.
+2. Go to the **Settings** tab > **Variables**.
+3. Scroll down to **KV Namespace Bindings** and click **Add binding**.
+4. Set the **Variable name** to `SPEED_KV`.
+5. Set the **KV namespace** to `SPEED_HISTORY`.
+6. Click **Save and Deploy**.
 
-3.  **Update `wrangler.toml`:**
-    Create a `wrangler.toml` file in the root directory:
-    ```toml
-    name = "speedtest-worker"
-    main = "src/index.js"
-    compatibility_date = "2024-01-01"
+## 📊 How it Works
 
-    [[kv_namespaces]]
-    binding = "SPEED_KV"
-    id = "PASTE_YOUR_KV_ID_HERE"
-    ```
+* **Ping:** Measures the round-trip time to the nearest Cloudflare PoP.
+* **Download:** Streams random data chunks to calculate speed without filling memory.
+* **Upload:** Sends a POST request to calculate the time taken to transmit data.
 
-### 3. Deploy
-Run the deploy command:
-```bash
-wrangler deploy
+## 📝 License
+MIT
